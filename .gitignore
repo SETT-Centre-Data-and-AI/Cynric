@@ -1,0 +1,114 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+__pycache__
+*.py[cod]
+*$py.class
+tests/outputs
+.ruff_cache
+.pytest_cache
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+poetry.lock
+uv.lock
+.coverage
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Secrets
+*.env
+*.yaml
+
+# VSCode
+*.vscode
+*.code-workspace
+
+# Virtual Environments
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Documents
+*.doc
+*.docx
+*.dot
+*.dotx
+*.rtf
+*.odt
+*.pdf
+*.ppt
+*.pptx
+*.odp
+*.key
+*.pages
+*.numbers
+
+# Notes
+*.txt
+*.log
+
+# Archives
+*.zip
+*.tar
+*.gz
+*.tgz
+*.bz2
+*.7z
+*.rar
+*.xz
+
+# Data
+*.xlsx
+*.xltx
+*.xltm
+*.xls
+*.xlsm
+*.xlsb
+*.csv
+*.tsv
+*.tab
+*.ods
+*.xml
+*.parquet
+*.arrow
+
+# Other
+*.ipynb
+
+# Keep
+!*.pre-commit-config.yaml
+!*.github/workflows/*.yaml
+
+# Project Specific
+## project-specific folders/files/patterns to exclude
+## do not use for personal files (use .git/exclude for personal items)
+
+
+# Project Keep

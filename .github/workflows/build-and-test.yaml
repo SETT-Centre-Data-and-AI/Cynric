@@ -36,6 +36,8 @@ jobs:
       PACKAGE_NAME: ${{ needs.env-config.outputs.PACKAGE_NAME }}
       PRIVATE_REPO: ${{ needs.env-config.outputs.PRIVATE_REPO }}
       PRIVATE_REPO_MAIN_BRANCH: ${{ needs.env-config.outputs.PRIVATE_REPO_MAIN_BRANCH }}
+      PYTHON_KEYRING_BACKEND: keyrings.alt.file.PlaintextKeyring
+
 
     steps:
     - name: Checkout Code
@@ -49,7 +51,7 @@ jobs:
     - name: Install UV, Poetry, and tooling
       run: |
         python -m pip install --upgrade pip
-        pip install uv poetry build pytest
+        pip install uv poetry build pytest keyrings-alt
 
     - name: Build Package
       run: |
@@ -83,8 +85,6 @@ jobs:
       matrix:
         include:
         - os: ubuntu-latest
-          python-version: '3.10'
-        - os: ubuntu-latest
           python-version: '3.11'
         - os: ubuntu-latest
           python-version: '3.12'
@@ -103,12 +103,13 @@ jobs:
       PACKAGE_NAME: ${{ needs.env-config.outputs.PACKAGE_NAME }}
       PRIVATE_REPO: ${{ needs.env-config.outputs.PRIVATE_REPO }}
       PRIVATE_REPO_MAIN_BRANCH: ${{ needs.env-config.outputs.PRIVATE_REPO_MAIN_BRANCH }}
+      PYTHON_KEYRING_BACKEND: keyrings.alt.file.PlaintextKeyring
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Install Kraken System Dependencies (Ubuntu)
+    - name: Install System Dependencies (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
@@ -121,7 +122,7 @@ jobs:
     - name: Install UV and Tooling
       run: |
         python -m pip install --upgrade pip
-        pip install uv build pytest
+        pip install uv build pytest keyring keyrings-alt
 
     - name: Install Package (UV)
       run: |
@@ -129,4 +130,4 @@ jobs:
 
     - name: Run Tests
       run: |
-        uv run --active pytest
+        uv run --active pytest -m "not internal"

@@ -109,6 +109,6 @@ venv.bak/
 # Project Specific
 ## project-specific folders/files/patterns to exclude
 ## do not use for personal files (use .git/exclude for personal items)
-
+*.crt
 
 # Project Keep

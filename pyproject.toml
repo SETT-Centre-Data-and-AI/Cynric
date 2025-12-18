@@ -1,16 +1,21 @@
 [project]
 name = "cynric"
-version = "0.1.0"
+version = "1.0.0"
 description = "Cynric is a package for validating and uploading data to the Wessex SDE"
-authors = [{ name = "Ben Sale"}]
+authors = [{ name = "Ben Sale"}, {name="Michael George"}, {name="Cai Davis"}]
 license = "CC-BY-NC-4.0"
 readme = "README.md"
-requires-python = ">=3.10,<4"
+requires-python = ">=3.11,<4"
 
 # Dependencies
 dependencies = [
-
-
+    "keyring>=25.7.0",
+    "keyrings-alt>=5.0.2 ; sys_platform == 'linux'",
+    "polars>=1.35.2",
+    "python-dotenv>=1.2.1",
+    "rapidfuzz>=3.14.3",
+    "urllib3>=2.5.0",
+    "valediction>=1.2.0",
 ]
 
 # Development
@@ -22,6 +27,8 @@ dev = [
   "mypy>=1.18.2,<2.0.0",
   "ipykernel (>=7.1.0,<8.0.0)",
   "pre-commit>=4.4.0,<5.0.0",
+  "types-requests>=2.32.4.20250913",
+  "types-urllib3>=1.26.25.14",
 ]
 
 [tool.uv]
@@ -43,7 +50,7 @@ include = [
 ]
 
 [tool.hatch.build.targets.wheel.sources]
-"src/kraken" = "cynric"
+"src/cynric" = "cynric"
 
 [tool.poetry]
 packages = [
@@ -57,4 +64,4 @@ tag_format = "v$major.$minor.$patch$prerelease"
 version_type = "pep440"
 version_provider = "pep621"
 update_changelog_on_bump = true
-major_version_zero = true
+major_version_zero = false

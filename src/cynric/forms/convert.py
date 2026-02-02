@@ -76,7 +76,7 @@ def _build_bc_dictionary_frames(
         table_rows.append([table.name, getattr(table, "description", None)])
 
         for column in table:
-            key_value = _as_int_flag(getattr(column, "primary_key", None))
+            key_value = _as_optional_int(getattr(column, "primary_key", None))
             length_value = _as_optional_int(getattr(column, "length", None))
 
             column_rows.append(
@@ -176,14 +176,14 @@ def _export_bc_dictionary(
     return output_dir
 
 
-def create_bc_forms(
+def create_forms_from_bc_dictionary(
     excel_path: str | Path,
     *,
     forms_output_dir: str | Path | None,
     tables_sheet: str = "Tables",
     columns_sheet: str = "Columns",
 ) -> BCDictionaryFrames:
-    """Create BC form files from an exported dictionary XLSX.
+    """Create BC form files from an exported BC dictionary XLSX.
 
     This is the inverse of `create_forms_from_dictionary(..., export_excel_path=...)`:
     it reads the XLSX and re-generates per-table form `.txt` files.
@@ -205,14 +205,14 @@ def create_bc_forms(
     return frames
 
 
-def create_bc_dictionary(
+def create_bc_files(
     dictionary: Dictionary | Path | str,
     *,
     forms_output_dir: str | Path | None,
     type_converter: TypeConverter = _convert_to_bc_type,
     export_excel_path: str | Path | None = None,
 ) -> BCDictionaryFrames:
-    """Create BC form files for every table in `dictionary`.
+    """Create BC form files as well as a BC specific data dictionary`.
 
     If `export_excel_path` is provided, also writes a 2-sheet XLSX with 'Tables'
     and 'Columns' dataframes.

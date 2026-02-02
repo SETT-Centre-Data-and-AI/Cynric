@@ -1,3 +1,13 @@
+## v1.1.0 (2026-02-02)
+
+### Fix
+
+- **forms**: fix to form and bc dictionary creation so that composite primary keys are assigned auto-incremented integers correctly
+
+### Refactor
+
+- **forms**: renamed function names for creating bc specific files + added to readme
+
 ## v1.0.0 (2025-12-18)
 
 ### Feat

@@ -1,3 +1,25 @@
+## v1.5.0 (2026-02-03)
+
+### Fix
+
+- **README.md**: spelling
+
+## v1.3.0 (2026-02-03)
+
+### Feat
+
+- **bigint-&-timestamp**: wired in valediction changes, inc v1.5, timestamp change, and bigint checking
+
+## v1.2.0 (2026-02-02)
+
+### Fix
+
+- **forms**: fix to form and bc dictionary creation so that composite primary keys are assigned auto-incremented integers correctly
+
+### Refactor
+
+- **forms**: renamed function names for creating bc specific files + added to readme
+
 ## v1.1.0 (2026-02-02)
 
 ### Fix

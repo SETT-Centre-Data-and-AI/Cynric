@@ -47,7 +47,7 @@ _BC_TYPE_MAPPING: dict[DataType, str] = {
     DataType.INTEGER: "Integer",
     DataType.FLOAT: "Float",
     DataType.DATE: "Date",
-    DataType.DATETIME: "Timestamp",
+    DataType.TIMESTAMP: "Timestamp",
 }
 
 

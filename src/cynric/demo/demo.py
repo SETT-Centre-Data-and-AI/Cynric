@@ -38,8 +38,9 @@ def push_demo_data(
     Returns:
         Dataset: Demo dataset returned after upload
     """
+    dataset = import_demo_data()
     dataset = validate_and_upload(
-        DEMO_DATA,
+        dataset,
         target_table_map,
         token=token,
         base_url=base_url,
@@ -56,4 +57,5 @@ def import_demo_data() -> Dataset:
     """
     dataset = Dataset().create_from(DEMO_DATA)
     dataset.import_dictionary(DEMO_DICTIONARY)
+    dataset.import_data()
     return dataset

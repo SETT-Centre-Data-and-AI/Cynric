@@ -12,7 +12,7 @@ from cynric.exceptions import (
     EmptyDatasetError,
     UnvalidatedDatasetError,
 )
-from cynric.uploading.helpers import check_target_table_map
+from cynric.uploading.helpers import check_target_table_map, _estimate_chunks
 from cynric.validation.validation import validate
 
 
@@ -175,7 +175,8 @@ class Uploader:
                     # Import Chunk
                     progress.begin_step("Importing")
                     chunk = next(iterator)
-                    progress.retarget_total(chunk.estimate_chunk_count() * steps)
+                    total_chunks = _estimate_chunks(item, chunk, chunk_size)
+                    progress.retarget_total(total_chunks * steps)
                     progress.complete_step()
 
                     # Convert to CSV

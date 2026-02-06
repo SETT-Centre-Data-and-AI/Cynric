@@ -1,3 +1,10 @@
+## v1.6.0 (2026-02-06)
+
+### Fix
+
+- **push_demo_data**: fixed issue with unattached data dictionary, and imported data
+- **uploading**: fixed retarget_total failure when data are already imported
+
 ## v1.5.0 (2026-02-03)
 
 ### Fix

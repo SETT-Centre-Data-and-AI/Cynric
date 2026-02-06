@@ -42,7 +42,7 @@ cynric.save_credentials(
 
 
 ## Identify Tables for Demo Upload
-sde_tables = cynric.check_table_access(print=True)
+sde_tables = cynric.check_table_access(include_datasets=True, print=True)
 ```
 ```python
 ## Upload Demo Data
@@ -71,7 +71,7 @@ dataset
 
 ```python
 # Identify Tables
-sde_tables = cynric.check_table_access(print=True)
+sde_tables = cynric.check_table_access(include_datasets=True, print=True)
 ```
 
 ```python
@@ -97,6 +97,33 @@ create_bc_files(
   export_excel_path='path/to/excel_file.xlsx' # Optionally a BC specific data dictionary can be exported as an excel file
 )
 
+```
+
+### Column Name Validation
+Use the column validator utilities to normalize column names to be compatible with BC Insight, validate them, and report issues.
+
+```python
+import pandas as pd
+from cynric.utils.column_validator import (
+    Reporter,
+    Verbosity,
+    fix_column_names_in_dataframe,
+    validate_tables_with_reporter,
+    process_and_report_duplicates,
+)
+
+df = pd.DataFrame([[1, 2]], columns=["bad col", "OK"])
+fixed = fix_column_names_in_dataframe(df)
+
+reporter = Reporter(Verbosity.default)
+results, mappings = validate_tables_with_reporter(
+    [("VISITS", df)],
+    reporter=reporter,
+    autofix_columns=True,
+)
+
+# Check for duplicate columns after optional autofix
+process_and_report_duplicates([("VISITS", df)])
 ```
 
 # 🧠 Function Quicklist

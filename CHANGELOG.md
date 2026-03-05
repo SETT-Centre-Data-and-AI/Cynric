@@ -1,3 +1,14 @@
+## v1.7.0 (2026-03-05)
+
+### Feat
+
+- **pk_char_limit**: added valediction override for pk col max length of 64
+- **utils**: added column_validator to normalise column names to be compatible with BC insight (#29)
+
+### Fix
+
+- **uploading**: columns uppercase before upload
+
 ## v1.6.0 (2026-02-06)
 
 ### Fix

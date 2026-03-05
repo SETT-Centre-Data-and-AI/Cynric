@@ -1,6 +1,6 @@
 [project]
 name = "cynric"
-version = "1.6.0"
+version = "1.7.0"
 description = "Cynric is a package for validating and uploading data to the Wessex SDE"
 authors = [{ name = "Ben Sale"}, {name="Michael George"}, {name="Cai Davis"}]
 license = "CC-BY-NC-4.0"
@@ -15,7 +15,7 @@ dependencies = [
     "python-dotenv>=1.2.1",
     "rapidfuzz>=3.14.3",
     "urllib3>=2.5.0",
-    "valediction>=1.5.0",
+    "valediction>=1.6.0",
 ]
 
 # Development

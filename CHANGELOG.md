@@ -1,3 +1,65 @@
+## v1.7.2 (2026-03-24)
+
+### Feat
+
+- **config.yaml**: fixed repo urls
+
+## v1.7.1 (2026-03-24)
+
+### Feat
+
+- **pk_char_limit**: added valediction override for pk col max length… (#36)
+
+## v1.7.0 (2026-03-05)
+
+### Feat
+
+- **pk_char_limit**: added valediction override for pk col max length of 64
+- **utils**: added column_validator to normalise column names to be compatible with BC insight (#29)
+
+### Fix
+
+- **uploading**: columns uppercase before upload
+
+## v1.6.0 (2026-02-06)
+
+### Fix
+
+- **push_demo_data**: fixed issue with unattached data dictionary, and imported data
+- **uploading**: fixed retarget_total failure when data are already imported
+
+## v1.5.0 (2026-02-03)
+
+### Fix
+
+- **README.md**: spelling
+
+## v1.3.0 (2026-02-03)
+
+### Feat
+
+- **bigint-&-timestamp**: wired in valediction changes, inc v1.5, timestamp change, and bigint checking
+
+## v1.2.0 (2026-02-02)
+
+### Fix
+
+- **forms**: fix to form and bc dictionary creation so that composite primary keys are assigned auto-incremented integers correctly
+
+### Refactor
+
+- **forms**: renamed function names for creating bc specific files + added to readme
+
+## v1.1.0 (2026-02-02)
+
+### Fix
+
+- **forms**: fix to form and bc dictionary creation so that composite primary keys are assigned auto-incremented integers correctly
+
+### Refactor
+
+- **forms**: renamed function names for creating bc specific files + added to readme
+
 ## v1.0.0 (2025-12-18)
 
 ### Feat

@@ -5,16 +5,21 @@ import pytest
 from support import (
     DEMO_DATA,
     DEMO_DICTIONARY,
-    GOOD_TOKEN,
-    GOOD_URL,
-    get_actual_table_map,
-    get_dataset,
 )
+from valediction.datasets.datasets import Dataset  # type: ignore
 
 from cynric.uploading.convenience import validate_and_upload
 from cynric.uploading.uploading import Uploader
 
-pytestmark = pytest.mark.internal
+RUNNING_IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS", "").lower() == "true"
+
+pytestmark = [
+    pytest.mark.internal,
+    pytest.mark.skipif(
+        RUNNING_IN_GITHUB_ACTIONS,
+        reason="Real upload tests only run locally.",
+    ),
+]
 
 # ----- OVERRIDES -------#
 # TODO - Replace with DEMO_DATA when uploaded to SDE
@@ -26,9 +31,6 @@ DEMO_DATA_FILENAME = "Fake_Clinical_Data"
 def get_actual_table_map():
     DEMO_DATA_MAP = {DEMO_DATA_FILENAME: "ds100691"}
     return DEMO_DATA_MAP
-
-
-from valediction.datasets.datasets import Dataset  # type: ignore
 
 
 def get_dataset() -> Dataset:

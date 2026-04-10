@@ -38,8 +38,9 @@ def push_demo_data(
     Returns:
         Dataset: Demo dataset returned after upload
     """
+    dataset = create_demo_dataset()
     dataset = validate_and_upload(
-        DEMO_DATA,
+        dataset,
         target_table_map,
         token=token,
         base_url=base_url,
@@ -48,7 +49,7 @@ def push_demo_data(
     return dataset
 
 
-def import_demo_data() -> Dataset:
+def create_demo_dataset() -> Dataset:
     """Demo/test function to import the Valediction demo dataset.
 
     Returns:
@@ -56,4 +57,5 @@ def import_demo_data() -> Dataset:
     """
     dataset = Dataset().create_from(DEMO_DATA)
     dataset.import_dictionary(DEMO_DICTIONARY)
+    dataset.import_data()
     return dataset

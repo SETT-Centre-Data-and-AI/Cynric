@@ -12,7 +12,7 @@ from cynric.exceptions import (
     EmptyDatasetError,
     UnvalidatedDatasetError,
 )
-from cynric.uploading.helpers import check_target_table_map
+from cynric.uploading.helpers import _estimate_chunks, check_target_table_map
 from cynric.validation.validation import validate
 
 
@@ -95,7 +95,8 @@ class Uploader:
     # Helpers
     def _create_csv_in_memory(self, df: DataFrame) -> BytesIO:
         """Converts a DataFrame to a CSV in memory."""
-        csv_bytes = df.to_csv(index=False).encode("utf-8")
+        upload_df = df.rename(columns=lambda col: str(col).upper())
+        csv_bytes = upload_df.to_csv(index=False).encode("utf-8")
         buffer = BytesIO(csv_bytes)
         buffer.seek(0)
         return buffer
@@ -175,7 +176,8 @@ class Uploader:
                     # Import Chunk
                     progress.begin_step("Importing")
                     chunk = next(iterator)
-                    progress.retarget_total(chunk.estimate_chunk_count() * steps)
+                    total_chunks = _estimate_chunks(item, chunk, chunk_size)
+                    progress.retarget_total(total_chunks * steps)
                     progress.complete_step()
 
                     # Convert to CSV

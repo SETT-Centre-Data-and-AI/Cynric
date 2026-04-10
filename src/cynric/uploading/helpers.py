@@ -2,7 +2,7 @@ from collections.abc import Mapping
 
 from valediction.datasets.datasets import Dataset  # type: ignore
 from valediction.support import list_as_bullets  # type: ignore
-
+from math import ceil
 
 def check_target_table_map(
     dataset: Dataset, target_table_map: Mapping[str, str]
@@ -69,3 +69,26 @@ def check_target_table_map(
             f"{missing_in_dataset_message}"
             f"{missing_in_target_table_map_message}"
         )
+
+def _estimate_chunks(item, chunk, chunk_size: int | None) -> int:
+    # If reading from Valediction file I/O buffer
+    if (
+        chunk.total_size is not None
+        and chunk.total_bytes_read is not None
+        and chunk.total_chunks_seen is not None
+    ):
+        return max(1, int(chunk.estimate_chunk_count()))
+
+    # Or if reading from DataFrame
+    if not chunk_size or chunk_size <= 0:
+        return 1
+
+    for attr in ("df", "data", "dataframe"):
+        if hasattr(item, attr):
+            obj = getattr(item, attr)
+            if obj is not None:
+                return max(1, int(ceil(len(obj) / chunk_size)))
+
+    # Fallback: infer total rows from chunk indices (0-based inclusive end)
+    total_rows = int(chunk.end) + 1
+    return max(1, int(ceil(total_rows / chunk_size)))

@@ -13,9 +13,16 @@ TOKEN = os.getenv("BC_TOKEN")
 BASE_URL = os.getenv("DEFAULT_BASE_URL")
 TEST_DATASET_ID = "ds100691"
 TEST_DATA_FILE = Path(__file__).parent / "data" / "Fake_Clinical_Data.csv"
+RUNNING_IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS", "").lower() == "true"
 
 
-pytestmark = pytest.mark.internal
+pytestmark = [
+    pytest.mark.internal,
+    pytest.mark.skipif(
+        RUNNING_IN_GITHUB_ACTIONS,
+        reason="Real API connectivity tests only run locally.",
+    ),
+]
 
 
 def connect():

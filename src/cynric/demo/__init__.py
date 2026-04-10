@@ -1,6 +1,6 @@
 from cynric.demo.demo import (
     DEMO_DATA,  # noqa
     DEMO_DICTIONARY,  # noqa
-    import_demo_data,  # noqa
+    create_demo_dataset,  # noqa
     push_demo_data,  # noqa
 )

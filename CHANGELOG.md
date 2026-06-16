@@ -1,3 +1,25 @@
+## v1.7.5 (2026-06-16)
+
+### Fix
+
+- **test_08_config_injection.py**: fixed new default
+
+## v1.7.4 (2026-06-16)
+
+### Feat
+
+- **instantiation**: enforce_no_null_columns = False (fine for csv API)
+
+## v1.7.3 (2026-06-16)
+
+### Feat
+
+- **instantiation**: added enforce_no_null_column valediction injection
+
+### Fix
+
+- **tests**: fixed testing setup to add internal only tests
+
 ## v1.7.2 (2026-03-24)
 
 ### Feat

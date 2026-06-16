@@ -1,8 +1,10 @@
 import pytest  # noqa
 import support as support  # noqa
 from typing import Any  # noqa
+import pandas as pd
 from valediction.datasets.datasets import Dataset  # type: ignore
 from valediction.exceptions import DataDictionaryError
+from valediction.exceptions import DataIntegrityError
 
 from cynric.validation.validation import validate
 
@@ -55,6 +57,19 @@ def test_validation_using_validiction() -> None:
     dataset.import_dictionary(support.DEMO_DICTIONARY)
     dataset.validate()  # no Cynric config override
     dataset.check()
+
+
+def test_validation_rejects_fully_null_column() -> None:
+    dataset = Dataset().create_from(support.DEMO_DATA)
+    dataset.import_dictionary(support.DEMO_DICTIONARY)
+    dataset.import_data()
+
+    table = dataset["DEMOGRAPHICS"]
+    table.data["PATIENT_HASH"] = pd.NA
+
+    with pytest.raises(DataIntegrityError):
+        dataset.validate()
+        dataset.check()
 
 
 def test_validation_path_no_dictionary_raises() -> None:

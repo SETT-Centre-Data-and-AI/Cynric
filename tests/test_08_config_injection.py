@@ -69,6 +69,16 @@ def test_cynric_injection(_restore_cynric_variables) -> None:
             assert getattr(config, key) == value
 
 
+def test_cynric_injection_enforces_no_null_columns(_restore_cynric_variables) -> None:
+    from valediction import get_config
+
+    from cynric.instantiation import inject_cynric_variables
+
+    inject_cynric_variables()
+
+    assert get_config().enforce_no_null_columns is False
+
+
 def test_importing_cynric_triggers_injection(_restore_cynric_variables) -> None:
     import cynric
     from cynric.instantiation import CYNRIC_VARIABLES

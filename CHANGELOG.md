@@ -1,3 +1,9 @@
+## v1.7.6 (2026-07-06)
+
+### Feat
+
+- add description normalization and truncation for forms
+
 ## v1.7.5 (2026-06-16)
 
 ### Fix

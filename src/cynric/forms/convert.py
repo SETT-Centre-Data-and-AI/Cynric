@@ -19,6 +19,7 @@ except ModuleNotFoundError as exc:  # pragma: no cover
 from .create import create_form
 
 TypeConverter = Callable[[Any], str]
+_DESCRIPTION_MAX_LENGTH = 250
 
 
 def _as_int_flag(value: Any) -> int | None:
@@ -34,6 +35,17 @@ def _as_optional_int(value: Any) -> int | None:
         return int(value)
     except (TypeError, ValueError):
         return None
+
+
+def _normalize_description(value: Any) -> Any:
+    if not isinstance(value, str):
+        return value
+
+    normalized = value.replace("\r\n", " ").replace("\r", " ").replace("\n", " ")
+    if len(normalized) <= _DESCRIPTION_MAX_LENGTH:
+        return normalized
+
+    return normalized[: _DESCRIPTION_MAX_LENGTH - 3] + "..."
 
 
 @dataclass(frozen=True, slots=True)
@@ -73,7 +85,9 @@ def _build_bc_dictionary_frames(
 
     for table_name in dictionary.get_table_names():
         table = dictionary.get_table(table_name)
-        table_rows.append([table.name, getattr(table, "description", None)])
+        table_rows.append(
+            [table.name, _normalize_description(getattr(table, "description", None))]
+        )
 
         for column in table:
             key_value = _as_optional_int(getattr(column, "primary_key", None))
@@ -85,7 +99,7 @@ def _build_bc_dictionary_frames(
                     type_converter(getattr(column, "data_type", None)),
                     key_value,
                     length_value,
-                    getattr(column, "description", None),
+                    _normalize_description(getattr(column, "description", None)),
                     table.name,
                     pd.NA,  # Choiceset
                     pd.NA,  # Choiceset Index
@@ -144,6 +158,12 @@ def _load_bc_dictionary_excel(
         ) from exc
 
     columns = _normalize_bc_dictionary_column_dtypes(columns)
+    if "Description" in tables.columns:
+        tables["Description"] = tables["Description"].apply(_normalize_description)
+    if "Column Description" in columns.columns:
+        columns["Column Description"] = columns["Column Description"].apply(
+            _normalize_description
+        )
 
     return BCDictionaryFrames(tables=tables, columns=columns)
 

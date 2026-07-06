@@ -98,6 +98,67 @@ def test_create_bc_forms_normalizes_excel_int_columns() -> None:
     assert (out_dir / "VITALS.txt").is_file()
 
 
+def test_create_bc_forms_sanitizes_and_truncates_descriptions() -> None:
+    pytest.importorskip("openpyxl")
+
+    long_table_description = ("A" * 248) + "\nXYZ"
+    long_column_description = ("B" * 248) + "\nZZZ"
+
+    tables = pd.DataFrame(
+        [["DEMOGRAPHICS", long_table_description]],
+        columns=["Table", "Description"],
+    )
+
+    columns = pd.DataFrame(
+        [
+            [
+                "PATIENT_HASH",
+                "Text",
+                1,
+                12,
+                long_column_description,
+                "DEMOGRAPHICS",
+                pd.NA,
+                pd.NA,
+            ]
+        ],
+        columns=[
+            "Column",
+            "Data Type",
+            "Key",
+            "Length",
+            "Column Description",
+            "Table",
+            "Choiceset",
+            "Choiceset Index",
+        ],
+    )
+
+    excel_path = _get_test_artifacts_dir() / "bc_dictionary_long_descriptions.xlsx"
+    with pd.ExcelWriter(excel_path, engine="openpyxl") as writer:
+        tables.to_excel(writer, sheet_name="Tables", index=False)
+        columns.to_excel(writer, sheet_name="Columns", index=False)
+
+    out_dir = _get_test_artifacts_dir() / "bc_dictionary_long_description_forms"
+    frames = create_forms_from_bc_dictionary(excel_path, forms_output_dir=out_dir)
+
+    table_description = frames.tables.loc[0, "Description"]
+    column_description = frames.columns.loc[0, "Column Description"]
+
+    assert len(table_description) == 250
+    assert len(column_description) == 250
+    assert table_description.endswith("...")
+    assert column_description.endswith("...")
+    assert "\n" not in table_description
+    assert "\n" not in column_description
+
+    generated_form = (out_dir / "DEMOGRAPHICS.txt").read_text()
+    assert table_description in generated_form
+    assert column_description in generated_form
+    assert long_table_description not in generated_form
+    assert long_column_description not in generated_form
+
+
 def test_create_bc_files_from_dummy_dictionary_exports_excel() -> None:
     pytest.importorskip("openpyxl")
 

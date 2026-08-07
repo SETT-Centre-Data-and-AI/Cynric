@@ -1,5 +1,5 @@
-from typing import Dict
 import warnings
+from typing import Dict
 
 try:
     import pandas as pd
@@ -9,6 +9,10 @@ except ModuleNotFoundError as exc:  # pragma: no cover
         "Install with `pip install pandas openpyxl`."
     ) from exc
 from pathlib import Path
+
+
+def _normalize_bc_name(name):
+    return str(name).strip().upper()
 
 
 def create_choiceset_df(df, choice_cols, table):
@@ -64,7 +68,7 @@ def create_choiceset_df(df, choice_cols, table):
         for item in col_choiceset["string"]:
             line += f"\t{item}"
 
-        processed = (table_name, col, line, idx)
+        processed = (_normalize_bc_name(table_name), _normalize_bc_name(col), line, idx)
         all_processed_choicesets.append(processed)
 
     column_choicesets = pd.DataFrame(
@@ -97,6 +101,7 @@ def create_header_footer(name):
 
 def create_form_properties(name):
     header, footer = create_header_footer("properties")
+    name = _normalize_bc_name(name)
 
     properties = {
         "name": name,
@@ -167,6 +172,8 @@ def create_form_variables(column_details, table_name):
     table_column_details = column_details
 
     variable_df = table_column_details.rename(columns=mapping)
+    if "VARIABLE" in variable_df.columns:
+        variable_df["VARIABLE"] = variable_df["VARIABLE"].map(_normalize_bc_name)
 
     for item in variable_items:
         if item not in variable_df.columns:
@@ -205,8 +212,7 @@ def create_form(
     table_name: str,
     output_dir: Path | str | None = None,
 ):
-    """
-    Docstring for create_form
+    """Docstring for create_form.
 
     form_name
     table_details: Pandas dataframe ['Table', 'Description']
@@ -229,7 +235,7 @@ def create_form(
     if output_dir is not None:
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
-        filepath = output_path / f"{table_name}.txt"
+        filepath = output_path / f"{_normalize_bc_name(table_name)}.txt"
         with open(filepath, "w") as f:
             f.write(form)
 

@@ -1,12 +1,13 @@
 from pathlib import Path
-import pytest
 
+import pytest
 import valediction as vale
 from valediction import demo
 from valediction.datasets.datasets import Dataset  # type: ignore
-from valediction.dictionary.model import Column, Dictionary, Table  # type: ignore
+
 from cynric.forms import create_bc_files
 from cynric.forms.convert import create_forms_from_bc_dictionary
+from cynric.forms.create import create_form
 
 pd = pytest.importorskip("pandas")
 
@@ -159,6 +160,158 @@ def test_create_bc_forms_sanitizes_and_truncates_descriptions() -> None:
     assert long_column_description not in generated_form
 
 
+def test_create_form_normalizes_emitted_names_without_mutating_inputs(tmp_path) -> None:
+    tables = pd.DataFrame(
+        [["  demo table  ", "Description"]], columns=["Table", "Description"]
+    )
+    columns = pd.DataFrame(
+        [
+            [
+                "  patient id ",
+                "Text",
+                1,
+                12,
+                "Identifier",
+                "  demo table  ",
+                pd.NA,
+                pd.NA,
+            ]
+        ],
+        columns=[
+            "Column",
+            "Data Type",
+            "Key",
+            "Length",
+            "Column Description",
+            "Table",
+            "Choiceset",
+            "Choiceset Index",
+        ],
+    )
+
+    create_form(
+        form_name="  demo table  ",
+        table_details=tables,
+        column_details=columns,
+        table_name="  demo table  ",
+        output_dir=tmp_path,
+    )
+
+    generated_form = (tmp_path / "DEMO TABLE.txt").read_text()
+    assert "name=DEMO TABLE" in generated_form
+    assert "PATIENT ID\tIdentifier" in generated_form
+    assert list(tables["Table"]) == ["  demo table  "]
+    assert list(columns["Column"]) == ["  patient id "]
+
+
+def test_create_bc_files_reports_transformed_headers(capsys, monkeypatch) -> None:
+    tables = pd.DataFrame(
+        [[" demographics ", "Description"], ["vitals", "Vitals"]],
+        columns=["Table", "Description"],
+    )
+    columns = pd.DataFrame(
+        [
+            [
+                " patient_id ",
+                "Text",
+                1,
+                12,
+                "Identifier",
+                " demographics ",
+                pd.NA,
+                pd.NA,
+            ],
+            ["weight", "Float", pd.NA, pd.NA, "Weight", "vitals", pd.NA, pd.NA],
+        ],
+        columns=[
+            "Column",
+            "Data Type",
+            "Key",
+            "Length",
+            "Column Description",
+            "Table",
+            "Choiceset",
+            "Choiceset Index",
+        ],
+    )
+
+    class Table:
+        def __init__(self, name):
+            self.name = name
+
+        def __iter__(self):
+            return iter([])
+
+    class Dictionary:
+        def get_table_names(self):
+            return [" demographics ", "vitals"]
+
+        def get_table(self, name):
+            return Table(name)
+
+    from cynric.forms import convert
+
+    frames = type("Frames", (), {"tables": tables, "columns": columns})()
+    monkeypatch.setattr(
+        convert,
+        "_build_bc_dictionary_frames",
+        lambda dictionary, type_converter: frames,
+    )
+
+    create_bc_files(Dictionary(), forms_output_dir=None)
+
+    assert (
+        "Note: some headers were transformed to uppercase (DEMOGRAPHICS, VITALS)."
+        in capsys.readouterr().out
+    )
+
+
+def test_create_bc_files_does_not_report_standardized_headers(
+    capsys, monkeypatch
+) -> None:
+    tables = pd.DataFrame(
+        [["DEMOGRAPHICS", "Description"]], columns=["Table", "Description"]
+    )
+    columns = pd.DataFrame(
+        [["PATIENT_ID", "Text", 1, 12, "Identifier", "DEMOGRAPHICS", pd.NA, pd.NA]],
+        columns=[
+            "Column",
+            "Data Type",
+            "Key",
+            "Length",
+            "Column Description",
+            "Table",
+            "Choiceset",
+            "Choiceset Index",
+        ],
+    )
+
+    class Table:
+        name = "DEMOGRAPHICS"
+
+        def __iter__(self):
+            return iter([])
+
+    class Dictionary:
+        def get_table_names(self):
+            return ["DEMOGRAPHICS"]
+
+        def get_table(self, name):
+            return Table()
+
+    from cynric.forms import convert
+
+    frames = type("Frames", (), {"tables": tables, "columns": columns})()
+    monkeypatch.setattr(
+        convert,
+        "_build_bc_dictionary_frames",
+        lambda dictionary, type_converter: frames,
+    )
+    create_bc_files(Dictionary(), forms_output_dir=None)
+
+    assert "transformed to uppercase" not in capsys.readouterr().out
+
+
 def test_create_bc_files_from_dummy_dictionary_exports_excel() -> None:
     pytest.importorskip("openpyxl")
 
@@ -186,7 +339,6 @@ def test_create_bc_files_from_dummy_dictionary_exports_excel() -> None:
         ],
         columns=["PATIENT_ID", "VISIT_ID", "VISIT_DATE", "HEIGHT_CM", "WEIGHT_KG"],
     )
-
 
     dataset = Dataset.create_from({"DEMOGRAPHICS": demographics, "VISITS": visits})
 

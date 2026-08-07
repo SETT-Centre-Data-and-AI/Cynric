@@ -16,10 +16,24 @@ except ModuleNotFoundError as exc:  # pragma: no cover
         "Install with `pip install pandas openpyxl`."
     ) from exc
 
-from .create import create_form
+from .create import _normalize_bc_name, create_form
 
 TypeConverter = Callable[[Any], str]
 _DESCRIPTION_MAX_LENGTH = 250
+
+
+def _print_transformed_tables(table_names: list[str]) -> None:
+    if table_names:
+        print(
+            "\nNote: some headers were transformed to uppercase ("
+            + ", ".join(table_names)
+            + ")."
+        )
+
+
+def _table_was_transformed(table_name: Any, column_names: pd.Series) -> bool:
+    names = [table_name, *column_names.tolist()]
+    return any(_normalize_bc_name(name) != str(name) for name in names)
 
 
 def _as_int_flag(value: Any) -> int | None:
@@ -41,11 +55,11 @@ def _normalize_description(value: Any) -> Any:
     if not isinstance(value, str):
         return value
 
-    normalized = value.replace("\r\n", " ").replace("\r", " ").replace("\n", " ")
-    if len(normalized) <= _DESCRIPTION_MAX_LENGTH:
-        return normalized
+    normalised = value.replace("\r\n", " ").replace("\r", " ").replace("\n", " ")
+    if len(normalised) <= _DESCRIPTION_MAX_LENGTH:
+        return normalised
 
-    return normalized[: _DESCRIPTION_MAX_LENGTH - 3] + "..."
+    return normalised[: _DESCRIPTION_MAX_LENGTH - 3] + "..."
 
 
 @dataclass(frozen=True, slots=True)
@@ -169,16 +183,16 @@ def _load_bc_dictionary_excel(
 
 
 def _normalize_bc_dictionary_column_dtypes(columns: pd.DataFrame) -> pd.DataFrame:
-    normalized = columns.copy()
+    normalised = columns.copy()
 
     for int_col in ("Key", "Length", "Choiceset Index"):
-        if int_col not in normalized.columns:
+        if int_col not in normalised.columns:
             continue
-        normalized[int_col] = pd.to_numeric(
-            normalized[int_col], errors="coerce"
+        normalised[int_col] = pd.to_numeric(
+            normalised[int_col], errors="coerce"
         ).astype("Int64")
 
-    return normalized
+    return normalised
 
 
 def _export_bc_dictionary(
@@ -213,7 +227,11 @@ def create_forms_from_bc_dictionary(
         excel_path, tables_sheet=tables_sheet, columns_sheet=columns_sheet
     )
 
+    transformed_tables: list[str] = []
+
     for table_name, table_column_details in frames.columns.groupby("Table"):
+        if _table_was_transformed(table_name, table_column_details["Column"]):
+            transformed_tables.append(_normalize_bc_name(table_name))
         create_form(
             form_name=str(table_name),
             table_details=frames.tables,
@@ -221,6 +239,8 @@ def create_forms_from_bc_dictionary(
             table_name=str(table_name),
             output_dir=forms_output_dir,
         )
+
+    _print_transformed_tables(transformed_tables)
 
     return frames
 
@@ -242,10 +262,15 @@ def create_bc_files(
 
     frames = _build_bc_dictionary_frames(dictionary, type_converter=type_converter)
 
+    transformed_tables: list[str] = []
+
     for table_name in dictionary.get_table_names():
         table = dictionary.get_table(table_name)
         table_column_details = frames.columns[frames.columns["Table"] == table.name]
         table_column_details = table_column_details.reset_index(drop=True)
+
+        if _table_was_transformed(table.name, table_column_details["Column"]):
+            transformed_tables.append(_normalize_bc_name(table.name))
 
         create_form(
             form_name=table.name,
@@ -260,5 +285,7 @@ def create_bc_files(
             export_excel_path,
             sheets={"Tables": frames.tables, "Columns": frames.columns},
         )
+
+    _print_transformed_tables(transformed_tables)
 
     return frames

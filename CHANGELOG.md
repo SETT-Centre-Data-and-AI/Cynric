@@ -1,3 +1,12 @@
+## v1.7.7 (2026-08-07)
+
+### Feat
+
+- **uppercase-warn**: added line space before note
+- **uppercase-inform**: transformations are informed following upload/form creation
+- **column-case**: columns converted to uppercase in forms and on upload
+- **check_table_access**: added include_datasets argument
+
 ## v1.7.6 (2026-07-06)
 
 ### Feat

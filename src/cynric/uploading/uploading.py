@@ -95,7 +95,7 @@ class Uploader:
     # Helpers
     def _create_csv_in_memory(self, df: DataFrame) -> BytesIO:
         """Converts a DataFrame to a CSV in memory."""
-        upload_df = df.rename(columns=lambda col: str(col).upper())
+        upload_df = df.rename(columns=lambda col: str(col).strip().upper())
         csv_bytes = upload_df.to_csv(index=False).encode("utf-8")
         buffer = BytesIO(csv_bytes)
         buffer.seek(0)
@@ -156,6 +156,7 @@ class Uploader:
         if feedback:
             print(f"Uploading {len(self.dataset)} tables")
 
+        transformed_tables: list[str] = []
         steps = 3
         max_name_len = max(len(item.name) for item in self.dataset)
 
@@ -183,6 +184,14 @@ class Uploader:
                     # Convert to CSV
                     df = chunk.df
                     progress.begin_step("Converting")
+                    normalised_columns = [
+                        str(column).strip().upper() for column in df.columns
+                    ]
+                    if (
+                        list(df.columns) != normalised_columns
+                        and item.name not in transformed_tables
+                    ):
+                        transformed_tables.append(item.name)
                     csv = self._create_csv_in_memory(df)
                     progress.complete_step()
 
@@ -205,6 +214,13 @@ class Uploader:
                     )
                     progress.close()
                     continue
+
+        if feedback and transformed_tables:
+            print(
+                "\nNote: some headers were transformed to uppercase ("
+                + ", ".join(transformed_tables)
+                + ")."
+            )
 
     def validate_and_upload(
         self,

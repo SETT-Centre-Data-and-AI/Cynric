@@ -2,6 +2,7 @@ from datetime import datetime
 from io import BytesIO
 
 from pandas import DataFrame  # type: ignore
+from valediction.convenience import validate
 from valediction.datasets.datasets import Dataset  # type: ignore
 from valediction.progress import Progress  # type: ignore
 from valediction.support import calculate_runtime, list_as_bullets  # type: ignore
@@ -13,7 +14,6 @@ from cynric.exceptions import (
     UnvalidatedDatasetError,
 )
 from cynric.uploading.helpers import _estimate_chunks, check_target_table_map
-from cynric.validation.validation import validate
 
 
 class Uploader:

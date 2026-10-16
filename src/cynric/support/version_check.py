@@ -15,13 +15,13 @@ class CynricUpdateAvailableWarning(UserWarning):
 
 
 def _is_newer(latest: str, current: str) -> bool:
-    """Best-effort version compare (handles semver if packaging is available)."""
+    """Return whether the latest published version is newer than current."""
     try:
-        from packaging.version import Version  # optional dependency
+        from packaging.version import Version
 
         return Version(latest) > Version(current)
     except Exception:
-        return latest != current
+        return False
 
 
 def check_version(

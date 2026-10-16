@@ -1,3 +1,15 @@
+## v1.7.9 (2026-10-14)
+
+### Feat
+
+- **valediction**: updated to 1.8.2 to support upcoming release, and removed convenience code duplication
+
+## v1.7.8 (2026-10-06)
+
+### Feat
+
+- **valediction**: upgrade valediction to 1.7.8 to include duplicate column warnings and datetime handling fixes
+
 ## v1.7.7 (2026-08-07)
 
 ### Feat

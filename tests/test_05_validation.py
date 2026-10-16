@@ -6,7 +6,7 @@ from valediction.datasets.datasets import Dataset  # type: ignore
 from valediction.exceptions import DataDictionaryError
 from valediction.exceptions import DataIntegrityError
 
-from cynric.validation.validation import validate
+from valediction.convenience import validate
 
 # from cynric.val
 
